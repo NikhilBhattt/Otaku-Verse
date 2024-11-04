@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import axios from 'axios'
+import search from '../assets/svgs/search.svg'
+
 
 const Search = ({Search, setSearch}) => {
     const getAnime = async (Search) => {
@@ -12,21 +14,40 @@ const Search = ({Search, setSearch}) => {
         });
     }
   return (
-    <form className='flex items-center gap-2' 
+    <form className='flex items-center px-2 w-[30vw] h-[10vh]' 
     onSubmit={(e) => {
         e.preventDefault()
         getAnime(Search);
     }}
     style={{
         backgroundColor: "rgba(250,166,156,0.5)",
-        maskImage: `url(../assets/svgs/search.svg)`,
-        maskSize: 'contain',
+        maskImage: `url("${search}")`,
         maskRepeat: 'no-repeat',
+        maskSize: 'contain',
         maskPosition: 'center',
-        WebkitMaskImage: `url(../assets/svgs/search.svg)`,
+        WebkitMaskRepeat: 'no-repeat', 
+        WebkitMaskSize: 'contain',
+        WebkitMaskPosition: 'center',
+        WebkitMaskImage: `url("${search}")`,
     }}
     >
-        <input type="text" value={Search} onChange={(e) => setSearch(e.target.value)} />
+        <input 
+            type="text" 
+            value={Search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="p-2 rounded outline-none "
+            style={{
+                backgroundColor:"rgba(255,255,255,1)",
+                maskImage: `url("${search}")`,
+                maskRepeat: 'no-repeat',
+                maskSize: 'contain',
+                maskPosition: 'center',
+                WebkitMaskRepeat: 'no-repeat', 
+                WebkitMaskSize: 'contain',
+                WebkitMaskPosition: 'center',
+                WebkitMaskImage: `url("${search}")`,
+            }}
+        />
     </form>
   )
 }

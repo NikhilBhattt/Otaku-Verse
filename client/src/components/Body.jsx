@@ -16,7 +16,7 @@ const Body = ({ children }) => {
             <Foot url={footImage} />
             <Profile />
             <Option />
-            <div className='relative h-[96vh] mt-2 bg-white'
+            <div className='relative h-[96vh] flex flex-col items-end bg-white mt-[2vh]'
                 style={{
                     backgroundImage: `url(${backgroundImage})`,
                     backgroundSize: 'cover',
@@ -31,10 +31,10 @@ const Body = ({ children }) => {
                     WebkitMaskPosition: 'center',
                 }}
             >
-                <div className='px-[10vw]'>
+                <div className='px-[10vw] w-[100vw]'>
                     <Title/>
                 </div>
-                <div className='flex items-center justify-center'>
+                <div className='flex items-center justify-between w-[80vw] mt-5 mr-10'>
                     {children}
                     <VrSlider />
                 </div>

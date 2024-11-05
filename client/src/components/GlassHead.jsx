@@ -13,7 +13,7 @@ const GlassHead = () => {
         WebkitMaskImage: `url(${trendingHeadSvg})`,
       }}
     >
-        <h2><span className='text-purple-500'>#</span> Trending</h2>
+        <h2 className='font-kaushan'><span className='text-purple-500'>#</span> Trending</h2>
       
     </div>
   )

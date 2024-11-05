@@ -6,7 +6,7 @@ import navBg from '../assets/svgs/nav.svg'  // Import the SVG
 const Nav = () => {
   return (
     <nav 
-      className='absolute top-[39.7vh] left-[2.2vw] -translate-y-1/2 inset-0 flex justify-evenly w-[4vw] h-[64vh] max-h-[700px]  items-center flex-col'
+      className='absolute top-[40vh] left-[2.2vw] -translate-y-1/2 flex justify-evenly w-[4.5vw] h-[64vh] max-h-[700px]  items-start pl-2 flex-col'
       style={{ 
         backgroundImage: `url(${navBg})`,
         backgroundRepeat: 'no-repeat',

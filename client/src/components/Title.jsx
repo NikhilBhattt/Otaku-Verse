@@ -4,7 +4,7 @@ import Logo from './Logo'
 
 const Title = () => {
     return (
-        <div className='flex items-center gap-[14vw]'>
+        <div className='flex items-center gap-[6vw]'>
             <Logo />
             <Search />
         </div>

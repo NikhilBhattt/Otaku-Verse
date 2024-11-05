@@ -1,9 +1,14 @@
 import ffmpeg from 'fluent-ffmpeg';
 import path from 'path';
+import fs from 'fs';
 
 const createHLSStream = ({ inputFile, streamId }) => {
-  const streamDir = path.join(process.cwd(), 'videos', streamId);
+  const streamDir = path.join(process.cwd(), 'videos', 'streams', streamId);
   
+  if (!fs.existsSync(streamDir)) {
+    fs.mkdirSync(streamDir, { recursive: true });
+  }
+
   const outputOptions = [
     '-hls_list_size 10',
     '-hls_time 4',
@@ -12,9 +17,9 @@ const createHLSStream = ({ inputFile, streamId }) => {
   ];
 
   return new Promise((resolve, reject) => {
-    const command = ffmpeg(inputFile)
-      .setFormat('hls')
-      .setOutputOptions(outputOptions)
+    const command = ffmpeg()
+      .input(inputFile)
+      .outputOptions(outputOptions)
       .output(`${streamDir}/playlist.m3u8`)
       .on('start', () => {
         console.log(`Stream ${streamId} started`);

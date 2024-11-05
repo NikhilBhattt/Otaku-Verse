@@ -1,13 +1,17 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 import search from '../assets/svgs/search.svg'
-
+import { useNavigate } from 'react-router-dom'
 
 const Search = ({Search, setSearch}) => {
+    const navigate = useNavigate();
+
     const getAnime = async (Search) => {
         axios.get(`https://api.jikan.moe/v4/anime?q=${Search}`)
         .then((response) => {
             console.log(response.data);
+            navigate('/search');
+
         })
         .catch((error) => {
             console.error('Error fetching anime:', error);

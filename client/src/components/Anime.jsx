@@ -9,7 +9,7 @@ const Anime = ({ title, image, desc, episodes }) => {
         return text;
     };
     return (
-        <div className='flex  border-[1px] border-gray-500 rounded-md'>
+        <div className='flex  border-[1px] hover:scale-105 transition-all duration-300 border-gray-500 rounded-md'>
             <div className='w-[10vw] h-[10vw] bg-red-500 flex items-end justify-start p-2' style={{ backgroundImage: `url(${image})` }}>
                 <p className='bg-purple-500 px-2 py-1 rounded-md'>{episodes}</p>
             </div>

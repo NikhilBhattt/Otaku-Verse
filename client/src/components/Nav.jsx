@@ -1,7 +1,11 @@
 import React from 'react'
-import { HomeIcon } from '@heroicons/react/24/outline'
 import NavElem from './NavElem'
 import navBg from '../assets/svgs/nav.svg'  // Import the SVG
+import home from '../assets/nav/home.svg'
+import info from '../assets/nav/info.svg'
+import fz from '../assets/nav/fz.svg'
+import querry from '../assets/nav/querry.svg'
+import MN from '../assets/nav/MN.svg'
 
 const Nav = () => {
   return (
@@ -13,11 +17,11 @@ const Nav = () => {
         backgroundSize: 'contain'
       }}
     >
-        <NavElem path="/" svg={<HomeIcon className='w-5 h-5 text-purple-500'/>} />
-        <NavElem path="/" svg={<HomeIcon className='w-5 h-5 text-purple-500'/>} />
-        <NavElem path="/" svg={<HomeIcon className='w-5 h-5 text-purple-500'/>} />
-        <NavElem path="/" svg={<HomeIcon className='w-5 h-5 text-purple-500'/>} />
-        <NavElem path="/" svg={<HomeIcon className='w-5 h-5 text-purple-500'/>} />
+        <NavElem path="/" svg={home} />
+        <NavElem path="/" svg={info} />
+        <NavElem path="/" svg={fz} />
+        <NavElem path="/" svg={MN} />
+        <NavElem path="/" svg={querry} />
     </nav>
   )
 }

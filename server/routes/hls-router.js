@@ -69,9 +69,7 @@ router.post('/stop-stream/:streamId', (req, res) => {
   }
 });
 
-export const setupHLSServer = (server) => {
-  // Your HLS server setup logic here
-};
+
 
 export default router;
 

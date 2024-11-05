@@ -38,14 +38,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 
-// Add CORS headers for HLS
-app.use('/videos', (req, res, next) => {
+// Add CORS headers for all routes
+app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   next();
 });
 
 // Serve static files
-app.use("/videos", express.static(path.join(__dirname, 'videos')));
+app.use("/videos", express.static(path.join(__dirname, 'videos','streams')));
 
 // Auth routes
 app.use("/auth", authRouter);

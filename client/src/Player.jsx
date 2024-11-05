@@ -38,7 +38,7 @@ const Player = ({currentVideo}) => {
         WebkitMaskRepeat: 'no-repeat'
       }}
     >
-      {streamUrl && <VideoPlayer src={streamUrl} />}
+      {streamUrl && <VideoPlayer src={"http://localhost:3000/videos/rj/playlist.m3u8"} />}
     </div>
   )
 }

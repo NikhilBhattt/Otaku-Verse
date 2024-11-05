@@ -1,6 +1,6 @@
 import express from "express";
-import { register, login } from "../controllers/auth-controller";
-import authMiddleware from "../middlewares/auth-middleware";
+import { register, login } from "../controllers/auth-controller.js";
+import authMiddleware from "../middlewares/auth-middleware.js";
 const router = express.Router();
 
 // Public Routes
@@ -12,4 +12,4 @@ router.get("/protected", authMiddleware, (req, res) => {
   res.json({ message: `Welcome ${req.user.username}!` });
 });
 
-module.exports = router;
+export default router;

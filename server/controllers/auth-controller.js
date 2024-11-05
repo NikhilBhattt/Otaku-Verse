@@ -1,5 +1,5 @@
 // controllers/authController.js
-import User from "../models/User";
+import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -46,7 +46,7 @@ const login = async (req, res) => {
       { expiresIn: process.env.JWT_EXPIRY }
     );
 
-    return res.json({ token });
+    return res.json({ message: "Login successfull", token });
   } catch (error) {
     return res.status(500).json({ message: "Error in login" });
   }

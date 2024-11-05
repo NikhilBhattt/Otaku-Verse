@@ -1,4 +1,5 @@
-const ffmpeg = require('fluent-ffmpeg');
+// import ffmpeg from 'fluent-ffmpeg';
+import ffmpeg from 'fluent-ffmpeg';
 
 const createHLSStream = (inputFile) => {
   const outputOptions = [
@@ -23,10 +24,4 @@ const createHLSStream = (inputFile) => {
   });
 };
 
-module.exports = {
-  createHLSStream
-};
-
-
-
-
+export { createHLSStream };

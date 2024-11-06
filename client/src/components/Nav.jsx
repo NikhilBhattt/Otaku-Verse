@@ -10,7 +10,7 @@ import MN from '../assets/nav/MN.svg'
 const Nav = () => {
   return (
     <nav 
-      className='absolute top-[40vh] left-[2.2vw] -translate-y-1/2 flex justify-evenly w-[4.5vw] h-[64vh] max-h-[700px]  items-start pl-2 flex-col'
+      className='flex justify-evenly w-[4.5vw] h-[64vh] max-h-[700px]  items-start pl-2 flex-col z-50'
       style={{ 
         backgroundImage: `url(${navBg})`,
         backgroundRepeat: 'no-repeat',

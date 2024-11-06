@@ -19,10 +19,8 @@ router.post('/start-stream', async (req, res) => {
     
     // Check if stream already exists
     if (activeStreams.has(streamId)) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Stream ID already exists' 
-      });
+      activeStreams.get(streamId).kill('SIGKILL');
+      activeStreams.delete(streamId);
     }
 
     // Create stream directory
@@ -68,8 +66,6 @@ router.post('/stop-stream/:streamId', (req, res) => {
     res.status(404).json({ success: false, message: 'Stream not found' });
   }
 });
-
-
 
 export default router;
 

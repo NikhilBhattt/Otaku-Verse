@@ -1,74 +1,88 @@
 import React, { useEffect, useRef } from 'react';
 import videojs from 'video.js';
 import 'video.js/dist/video-js.css';
-// Required for HLS playback
-import 'videojs-contrib-quality-levels';
-import '@videojs/http-streaming';
-import '@videojs/themes/dist/city/index.css';
 
-const VideoPlayer = ({ src }) => {
+const VideoPlayer = ({ streamId }) => {
   const videoRef = useRef(null);
   const playerRef = useRef(null);
 
   useEffect(() => {
-    console.log('Video source:', src);
+    if (!videoRef.current) return;
 
-    if (!playerRef.current) {
-      const videoElement = videoRef.current;
-      if (!videoElement) return;
+    const options = {
+      autoplay: true,
+      controls: true,
+      responsive: true,
+      fluid: true,
+      sources: [{
+        src: `http://localhost:5000/videos/streams/rj/playlist.m3u8`,
+        type: 'application/x-mpegURL'
+      }],
+      html5: {
+        vhs: {
+          overrideNative: true,
+          enableLowInitialPlaylist: true,
+          smoothQualityChange: true,
+          fastQualityChange: true,
+        }
+      },
+      liveui: true, // Enable live UI elements
+      liveTracker: {
+        trackingThreshold: 0.5,
+        liveTolerance: 15
+      }
+    };
 
-      const player = videojs(videoElement, {
-        controls: true,
-        fluid: true,
-        html5: {
-          hls: {
-            enableLowInitialPlaylist: true,
-            smoothQualityChange: true,
-            overrideNative: true
-          }
-        },
-        controlBar: {
-          playToggle: true,
-          volumePanel: true,
-          currentTimeDisplay: true,
-          timeDivider: true,
-          durationDisplay: true,
-          progressControl: {
-            seekBar: true
-          },
-          qualitySelector: true,
-          fullscreenToggle: true,
-          pictureInPictureToggle: true
-        },
-        sources: [{
-          src: src,
-          type: 'application/x-mpegURL' // HLS stream type
-        }]
-      }, function onPlayerReady() {
-        console.log('Player is ready');
+    // Create player instance
+    const player = videojs(videoRef.current, options, function onPlayerReady() {
+      console.log('Player ready');
+      
+      // Attempt autoplay
+      player.play().catch(error => {
+        console.log('Autoplay prevented:', error);
       });
+    });
 
-      playerRef.current = player;
+    // Error handling
+    player.on('error', (error) => {
+      console.error('Video.js error:', player.error());
+    });
 
-      // Handle quality levels if available
-      playerRef.current.qualityLevels();
-    }
+    // Quality level switching
+    player.on('qualityLevelsChanged', () => {
+      console.log('Quality level changed');
+    });
 
-    // Dispose the Video.js player when component unmounts
+    // Handle buffering states
+    player.on('waiting', () => {
+      console.log('Buffering...');
+    });
+
+    player.on('canplay', () => {
+      console.log('Can play');
+    });
+
+    // Store player reference
+    playerRef.current = player;
+
+    // Cleanup
     return () => {
       if (playerRef.current) {
         playerRef.current.dispose();
         playerRef.current = null;
       }
     };
-  }, [src]);
+  }, [streamId]); // Recreate player when streamId changes
 
   return (
-    <div data-vjs-player style={{ width: '60vw', height: '60vh', maxWidth: '800px', margin: '0 auto', backgroundColor: 'black'}}>
-      <video 
-        ref={videoRef}
-        className="video-js vjs-big-play-centered vjs-theme-city"
-      />
+    <div className="video-container">
+      <div data-vjs-player>
+        <video
+          ref={videoRef}
+          className="video-js vjs-big-play-centered vjs-theme-city"
+          playsInline
+        />
+      </div>
     </div>
   );
 };

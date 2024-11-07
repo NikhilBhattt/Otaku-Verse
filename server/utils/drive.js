@@ -5,9 +5,8 @@ const { Storage, File } = require('megajs');
 const megaEmail = process.env.MEGA_EMAIL;
 const megaPassword = process.env.MEGA_PASSWORD;
 
-
 // Download Folder Function
-async function downloadFolderFromMega(link, downloadPath) {
+const downloadFolderFromMega = async (link, downloadPath) => {
     return new Promise((resolve, reject) => {
         try {
             const folder = File.fromURL(link);
@@ -53,10 +52,10 @@ async function downloadFolderFromMega(link, downloadPath) {
             reject(error);
         }
     });
-}
+};
 
 // Upload Folder Function
-async function uploadFolderToMega(folderPath) {
+const uploadFolderToMega = async (folderPath) => {
     return new Promise(async (resolve, reject) => {
         try {
             const storage = new Storage({
@@ -113,14 +112,9 @@ async function uploadFolderToMega(folderPath) {
             reject(error);
         }
     });
-}
+};
 
-//example usage
-
-
-
-
-//exporting the functions
+// Exporting the functions
 module.exports = {
     downloadFolderFromMega,
     uploadFolderToMega

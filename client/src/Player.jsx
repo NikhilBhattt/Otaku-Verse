@@ -9,12 +9,11 @@ const Player = ({streamId}) => {
   useEffect(() => {
     axios.post('http://localhost:3000/hls/start-stream', {
       streamId: streamId,
-      inputFile: `videos/${streamId}.mp4`
     })
     .then(response => {
       console.log(response);
       if (response.data.success) {
-        setStreamUrl('http://localhost:3000/videos/streams/' + streamId + '/playlist.m3u8');
+        setStreamUrl('http://localhost:3000'+response.data.streamUrl);
       }
     })
     .catch(error => {

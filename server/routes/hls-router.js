@@ -5,6 +5,7 @@ import path from 'path';
 import { createHLSStream } from '../utils/ffmpeg.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { downloadFolderFromMega } from '../utils/drive.js';
 
 const router = express.Router();
 const activeStreams = new Map();
@@ -15,7 +16,7 @@ const __dirname = dirname(__filename);
 // Start stream endpoint
 router.post('/start-stream', async (req, res) => {
   try {
-    const { streamId, inputFile } = req.body;
+    const { streamId } = req.body;
 
     // Define the path to the playlist file
     const playlistPath = path.join(process.cwd(), 'videos', 'streams', streamId, 'playlist.m3u8');
@@ -41,14 +42,9 @@ router.post('/start-stream', async (req, res) => {
       fs.mkdirSync(streamDir, { recursive: true });
     }
 
-    // Create and start the stream
-    const command = await createHLSStream({ 
-      inputFile, 
-      streamId 
-    });
-
-    // Store stream reference
-    activeStreams.set(streamId, command);
+    // Download file from Mega
+    const megaFileUrl = req.body.megaFileUrl;
+    await downloadFolderFromMega(megaFileUrl, streamDir);
 
     res.json({
       success: true,
@@ -65,19 +61,6 @@ router.post('/start-stream', async (req, res) => {
   }
 });
 
-// Stop a stream
-router.post('/stop-stream/:streamId', (req, res) => {
-  const { streamId } = req.params;
-  const command = activeStreams.get(streamId);
-  
-  if (command) {
-    command.kill('SIGKILL');
-    activeStreams.delete(streamId);
-    res.json({ success: true, message: 'Stream stopped' });
-  } else {
-    res.status(404).json({ success: false, message: 'Stream not found' });
-  }
-});
 
 export default router;
 

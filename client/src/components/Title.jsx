@@ -2,11 +2,11 @@ import React from 'react'
 import Searchbox from './Searchbox'
 import Logo from './Logo'
 
-const Title = ({Search,setSearch}) => {
+const Title = () => {
     return (
         <div className='flex items-center gap-[6vw]'>
             <Logo />
-            <Searchbox Search={Search} setSearch={setSearch} />
+            <Searchbox/>
         </div>
     )
 }

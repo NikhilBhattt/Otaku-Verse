@@ -8,10 +8,10 @@ import { motion } from 'framer-motion'
 import Player from './Player'
 import './app.css'
 import cursor from './assets/cursor.gif'
+import { SearchProvider } from './contexts/SearchContext'
 
 function App() {
   const [Coord, setCoord] = useState({ x: 0, y: 0 })
-  const [Search, setSearch] = useState('')
   useEffect(() => {
     const handleMouseMove = (e) => {
       setCoord({ x: e.clientX, y: e.clientY });
@@ -21,7 +21,7 @@ function App() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
   return (
-    <>
+    <SearchProvider>
       <motion.div
         className='w-[20px] aspect-square absolute top-0 left-0 z-50 bg-white rounded-full'
         style={{
@@ -47,15 +47,13 @@ function App() {
 
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Body Search={Search} setSearch={setSearch} children={<Home />} />} />
-          <Route path="/search" element={<Body Search={Search} setSearch={setSearch} children={<Searchpage />} />} />
-          <Route path="/player" element={<Body Search={Search} setSearch={setSearch} children={<Player streamId={'rj'} />} />} />
-          <Route path="/upload" element={<Body Search={Search} setSearch={setSearch} children={<Upload/>} />} />
-          {/* <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} /> */}
+          <Route path="/" element={<Body children={<Home />} />} />
+          <Route path="/search" element={<Body children={<Searchpage />} />} />
+          <Route path="/player" element={<Body children={<Player streamId={'rj'} />} />} />
+          <Route path="/upload" element={<Body children={<Upload/>} />} />
         </Routes>
       </BrowserRouter>
-    </>
+    </SearchProvider>
   )
 }
 

@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Anime = ({ title, image, desc, episodes }) => {
+const Anime = ({ title = "hellkjhgfghjknbvfdtyuiuytfbnmnbvftyuiouytrdbnmnbftyuiuytghbbgfyuiolouyufhgvmb,hjfyoil", image, desc="hellkjhgfghjknbvfdtyuiuytfbnmnbvftyuiouytrdbnmnbftyuiuytghbbgfyuiolouyufhgvmb,hjfyoil", episodes }) => {
     const limitWords = (text, limit) => {
         const words = text.split('');
         if (words.length > limit) {

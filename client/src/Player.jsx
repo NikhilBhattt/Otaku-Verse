@@ -14,6 +14,7 @@ const Player = ({streamId}) => {
       console.log(response);
       if (response.data.success) {
         setStreamUrl('http://localhost:3000'+response.data.streamUrl);
+        console.log('this is stream url',streamUrl);
       }
     })
     .catch(error => {

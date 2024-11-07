@@ -85,7 +85,8 @@ const uploadFolderToMega = async (folderPath) => {
                         const fileStream = fs.createReadStream(filePath);
 
                         const uploadedFile = storage.upload({
-                            name: fileName
+                            name: fileName,
+                            allowUploadBuffering: true
                         }, fileStream);
 
                         uploadedFile.on('complete', () => {

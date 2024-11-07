@@ -1,17 +1,24 @@
-import React, { useState, useEffect } from 'react'
-import Anime from './components/Anime'
+import React, { useState, useEffect, useContext } from 'react';
+import Anime from './components/Anime';
 import axios from 'axios';
-const Searchpage = ({Search}) => {
+import { SearchContext } from './contexts/SearchContext'; // Import the context
+
+const Searchpage = () => {
+  const { Search } = useContext(SearchContext);
+  console.log('this is search',Search);
   const [searchResults, setSearchResults] = useState([]);
+
   useEffect(() => {
-    axios.get('http://localhost:3000/api/getAnime',{search: Search})
-      .then((res) => {
-        setSearchResults(res.data)
-        console.log(res.data)
-      })
-      .catch(err => console.log(err));
-  }, []);
-    
+    axios.post('http://localhost:3000/api/getAnime', {
+      Search: Search // Send search as part of the request body
+    })
+    .then((res) => {
+      setSearchResults(res.data);
+      console.log(res.data);
+    })
+    .catch(err => console.log(err));
+  }, [Search]); // Add search as a dependency
+
   return (
     <div className='h-screen'>
       <h1 className='text-2xl font-bold'>Search Results</h1>
@@ -23,7 +30,7 @@ const Searchpage = ({Search}) => {
         }
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Searchpage
+export default Searchpage;

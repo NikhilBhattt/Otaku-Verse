@@ -5,12 +5,33 @@ import { Anime, Episode } from '../models/anime.model.js'; // Import the Anime a
 import { createHLSStream } from '../utils/ffmpeg.js';
 import { uploadFolderToMega } from '../utils/drive.js';
 
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/'); // Ensure this directory exists
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({ storage: storage }).single('videoFile'); // 'videoFile' should match the form field name
+
+
 const router = express.Router();
-const upload = multer({ dest: 'uploads/' }); // Set the destination folder for uploads
 
-router.post('/upload', upload.single('file'), async (req, res) => {
-    const { name, description, totalEpisodes } = req.body; // Extract additional fields from the request
+router.post('/createAnime', async (req, res) => {
+    const { animeName, description } = req.body;
+    const newAnime = new Anime({ name: animeName, description });
+    await newAnime.save();
+    res.status(200).json(newAnime);
+});
 
+
+
+router.post('/upload',upload, async (req, res) => {
+    const { animeName, episodeName } = req.body; // Extract additional fields from the request
+    console.log(req.body);
     if (!req.file) {
         return res.status(400).json({ error: 'No file uploaded' });
     }
@@ -34,7 +55,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
             episodeNumber: 1, // Assuming this is the first episode, adjust as needed
             streamId,
             title: uploadedFile.originalname,
-            animeName: name,
+            animeName: animeName,
             link: megaLink
         });
 
@@ -42,11 +63,9 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 
         // Create or update the anime entry in the database
         const anime = await Anime.findOneAndUpdate(
-            { name },
+            { name:animeName },
             {
-                name,
-                description,
-                totalEpisodes,
+                name: animeName,
                 $push: { episodes: newEpisode._id }
             },
             { upsert: true, new: true }
@@ -65,16 +84,15 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 });
 
 
-router.get('/getAnime', async (req, res) => {
-    const { search } = req.query;
+router.post('/getAnime', async (req, res) => {
+    const { Search } = req.body;
     const anime = await Anime.find({
-        name: { $regex: search, $options: 'i' }  // Case-insensitive search for partial matches
+        name: { $regex: Search, $options: 'i' }  // Case-insensitive search for partial matches
     });
     res.status(200).json(anime);
 });
 
 router.get('/trending', async (req, res) => {
-    console.log('Trending anime requested');
     const anime = await Anime.find().sort({ createdAt: -1 }).limit(10);
     res.status(200).json(anime);
 });

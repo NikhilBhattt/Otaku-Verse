@@ -25,15 +25,28 @@ const createHLSStream = ({ inputFile, streamId }) => {
       })
       .on('end', () => {
         console.log(`Stream ${streamId} ended`);
+        fs.unlink(inputFile, (err) => {
+          if (err) {
+            console.error(`Error deleting input file ${inputFile}:`, err);
+          } else {
+            console.log(`Successfully deleted input file ${inputFile}`);
+          }
+        });
         resolve(command);
       })
       .on('error', (err) => {
         console.error(`Stream ${streamId} error:`, err);
+        fs.unlink(inputFile, (err) => {
+          if (err) {
+            console.error(`Error deleting input file ${inputFile}:`, err);
+          } else {
+            console.log(`Successfully deleted input file ${inputFile}`);
+          }
+        });
         reject(err);
       });
 
-    command.run();
-    resolve(command); // Resolve immediately with command to allow control
+    command.run();// Resolve immediately with command to allow control
   });
 };
 

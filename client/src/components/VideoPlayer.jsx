@@ -17,7 +17,7 @@ const VideoPlayer = ({ src }) => {
       responsive: true,
       fluid: true,
       sources: [{
-        src: "https://drive.google.com/uc?export=download&id=16QLJOz0NLjNEi4hS2Cqk6GLP5WoAnBCY/playlist.m3u8",
+        src: src,
         type: 'application/x-mpegURL'
       }],
       html5: {

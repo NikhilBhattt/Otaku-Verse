@@ -7,7 +7,7 @@ const Glass = () => {
   const [Trending, setTrending] = useState([])
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/trending')
+    axios.get('http://localhost:3000/api/trending')
       .then(res => setTrending(res.data))
       .catch(err => console.log(err))
   }, [])

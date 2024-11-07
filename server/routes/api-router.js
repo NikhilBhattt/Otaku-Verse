@@ -1,9 +1,9 @@
 import express from 'express';
 import multer from 'multer';
 import path from 'path';
-import { Anime, Episode } from '../models/anime.model'; // Import the Anime and Episode models
-import { createHLSStream } from '../utils/ffmpeg';
-import { uploadFolderToMega } from '../utils/drive';
+import { Anime, Episode } from '../models/anime.model.js'; // Import the Anime and Episode models
+import { createHLSStream } from '../utils/ffmpeg.js';
+import { uploadFolderToMega } from '../utils/drive.js';
 
 const router = express.Router();
 const upload = multer({ dest: 'uploads/' }); // Set the destination folder for uploads
@@ -62,6 +62,21 @@ router.post('/upload', upload.single('file'), async (req, res) => {
         console.error('Error processing file:', error);
         res.status(500).json({ error: 'Failed to process file' });
     }
+});
+
+
+router.get('/getAnime', async (req, res) => {
+    const { search } = req.query;
+    const anime = await Anime.find({
+        name: { $regex: search, $options: 'i' }  // Case-insensitive search for partial matches
+    });
+    res.status(200).json(anime);
+});
+
+router.get('/trending', async (req, res) => {
+    console.log('Trending anime requested');
+    const anime = await Anime.find().sort({ createdAt: -1 }).limit(10);
+    res.status(200).json(anime);
 });
 
 export default router;

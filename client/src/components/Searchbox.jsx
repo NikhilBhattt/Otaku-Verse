@@ -1,27 +1,18 @@
 import React, { useState } from 'react'
-import axios from 'axios'
 import search from '../assets/svgs/search.svg'
 import { useNavigate } from 'react-router-dom'
 
-const Search = ({Search, setSearch}) => {
+const Searchbox = ({Search, setSearch}) => {
     const navigate = useNavigate();
 
-    const getAnime = async (Search) => {
-        axios.get(`https://api.jikan.moe/v4/anime?q=${Search}`)
-        .then((response) => {
-            console.log(response.data);
-            navigate('/search');
-
-        })
-        .catch((error) => {
-            console.error('Error fetching anime:', error);
-        });
+    const getAnime = async () => {
+        navigate('/search');
     }
   return (
     <form className='flex items-center px-2 w-[30vw] h-[10vh]' 
     onSubmit={(e) => {
         e.preventDefault()
-        getAnime(Search);
+        getAnime();
     }}
     style={{
         backgroundColor: "rgba(250,166,156,0.5)",
@@ -56,4 +47,4 @@ const Search = ({Search, setSearch}) => {
   )
 }
 
-export default Search
+export default Searchbox

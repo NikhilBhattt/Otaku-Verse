@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import connectDB from "./db.js";
 import hlsRouter from "./routes/hls-router.js";
+import apiRouter from "./routes/api-router.js";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from 'url';
@@ -46,6 +47,8 @@ app.use((req, res, next) => {
 
 // Serve static files
 app.use("/videos", express.static(path.join(__dirname, 'videos')));
+
+app.use("/api", apiRouter);
 
 // Auth routes
 app.use("/auth", authRouter);

@@ -1,12 +1,10 @@
 import express from 'express';
-import hls from 'hls-server';
 import fs from 'fs';
 import path from 'path';
-import { createHLSStream } from '../utils/ffmpeg.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { downloadFolderFromMega } from '../utils/drive.js';
-import { Anime } from '../models/anime.model'; // Import the Anime model
+import { Anime } from '../models/anime.model.js';
 
 const router = express.Router();
 const activeStreams = new Map();

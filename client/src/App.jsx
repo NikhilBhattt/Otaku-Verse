@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Home from './Home'
-import Search from './Search'
+import Searchpage from './Searchpage'
 import Body from './components/Body'
 import Upload from './Upload'
 import { motion } from 'framer-motion'
@@ -11,6 +11,7 @@ import cursor from './assets/cursor.gif'
 
 function App() {
   const [Coord, setCoord] = useState({ x: 0, y: 0 })
+  const [Search, setSearch] = useState('')
   useEffect(() => {
     const handleMouseMove = (e) => {
       setCoord({ x: e.clientX, y: e.clientY });
@@ -46,10 +47,10 @@ function App() {
 
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Body children={<Home />} />} />
-          <Route path="/search" element={<Body children={<Search />} />} />
-          <Route path="/player" element={<Body children={<Player streamId={'rj'} />} />} />
-          <Route path="/upload" element={<Body children={<Upload/>} />} />
+          <Route path="/" element={<Body Search={Search} setSearch={setSearch} children={<Home />} />} />
+          <Route path="/search" element={<Body Search={Search} setSearch={setSearch} children={<Searchpage />} />} />
+          <Route path="/player" element={<Body Search={Search} setSearch={setSearch} children={<Player streamId={'rj'} />} />} />
+          <Route path="/upload" element={<Body Search={Search} setSearch={setSearch} children={<Upload/>} />} />
           {/* <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} /> */}
         </Routes>

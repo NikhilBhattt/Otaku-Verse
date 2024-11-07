@@ -10,7 +10,7 @@ import VrSlider from './VrSlider'
 import Title from './Title'
 import { motion } from 'framer-motion'
 
-const Body = ({ children }) => {
+const Body = ({ children, Search, setSearch }) => {
     const staggerDuration = 0.5;
     const staggerDelay = 0.5;
     return (
@@ -75,7 +75,7 @@ const Body = ({ children }) => {
                 }}
             >
                 <div className='px-[10vw] w-[100vw]'>
-                    <Title />
+                    <Title Search={Search} setSearch={setSearch}/>
                 </div>
                 <div className='flex items-start justify-between w-[84vw] mt-5 mr-10'>
                     {children}

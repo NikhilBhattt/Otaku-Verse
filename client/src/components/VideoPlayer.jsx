@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import videojs from 'video.js';
-import '@videojs/themes/dist/city/index.css';
+import '@videojs/themes/dist/forest/index.css';
 
 import 'video.js/dist/video-js.css';
 
@@ -17,7 +17,7 @@ const VideoPlayer = ({ src }) => {
       responsive: true,
       fluid: true,
       sources: [{
-        src: src,
+        src: "https://drive.google.com/uc?export=download&id=16QLJOz0NLjNEi4hS2Cqk6GLP5WoAnBCY/playlist.m3u8",
         type: 'application/x-mpegURL'
       }],
       html5: {
@@ -81,7 +81,7 @@ const VideoPlayer = ({ src }) => {
       <div data-vjs-player className="">
         <video
           ref={videoRef}
-          className="video-js vjs-big-play-centered vjs-theme-city "
+          className="video-js vjs-big-play-centered vjs-theme-forest "
           playsInline
         />
       </div>

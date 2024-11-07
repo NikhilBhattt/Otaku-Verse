@@ -1,164 +1,127 @@
-import { google } from 'googleapis';
-import fs from 'fs';
-import stream from 'stream';
-import { promisify } from 'util';
-import ffmpeg from 'fluent-ffmpeg';
-import path from 'path';
-import express from 'express';
+const fs = require('fs');
+const { Storage, File } = require('megajs');
 
-const SCOPES = ['https://www.googleapis.com/auth/drive.readonly'];
-const CHUNK_SIZE = 16 * 1024 * 1024; // 16MB chunks
+// Replace these with your Mega.nz account details
+const megaEmail = process.env.MEGA_EMAIL;
+const megaPassword = process.env.MEGA_PASSWORD;
 
-// Create auth client
-const auth = new google.auth.GoogleAuth({
-  keyFile: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-  scopes: SCOPES
-});
 
-const drive = google.drive({ version: 'v3', auth });
-const pipeline = promisify(stream.pipeline);
+// Download Folder Function
+async function downloadFolderFromMega(link, downloadPath) {
+    return new Promise((resolve, reject) => {
+        try {
+            const folder = File.fromURL(link);
 
-// Setup express router for HLS streaming
-const router = express.Router();
+            console.log('Starting download from Mega...');
 
-const convertToHLS = async (inputPath, outputDir, socket) => {
-  return new Promise((resolve, reject) => {
-    ffmpeg(inputPath)
-      .outputOptions([
-        '-hls_time 10',        // 10 second segments
-        '-hls_list_size 0',    // Keep all segments
-        '-hls_segment_type mpegts',
-        '-hls_segment_filename', path.join(outputDir, 'segment%d.ts')
-      ])
-      .output(path.join(outputDir, 'playlist.m3u8'))
-      .on('progress', (progress) => {
-        if(socket) {
-          socket.emit('conversionProgress', {
-            progress: progress.percent,
-            timemark: progress.timemark
-          });
+            // Iterate over each file in the folder
+            folder.loadAttributes((err, files) => {
+                if (err) {
+                    console.error('Error loading folder attributes:', err);
+                    return reject(err);
+                }
+
+                const downloadPromises = files.map(file => {
+                    return new Promise((fileResolve, fileReject) => {
+                        const filePath = `${downloadPath}/${file.name}`;
+                        const writeStream = fs.createWriteStream(filePath);
+
+                        file.download().pipe(writeStream);
+
+                        writeStream.on('finish', () => {
+                            console.log(`File downloaded successfully to ${filePath}`);
+                            fileResolve();
+                        });
+
+                        writeStream.on('error', (error) => {
+                            console.error('Error downloading file:', error);
+                            fileReject(error);
+                        });
+                    });
+                });
+
+                Promise.all(downloadPromises)
+                    .then(() => {
+                        console.log('All files downloaded successfully.');
+                        resolve();
+                    })
+                    .catch(reject);
+            });
+
+        } catch (error) {
+            console.error('Error downloading from Mega:', error);
+            reject(error);
         }
-      })
-      .on('end', () => resolve())
-      .on('error', (err) => reject(err))
-      .run();
-  });
-};
-
-const downloadAndProcessFile = async (fileId, tempDir, socket) => {
-  try {
-    if (!fs.existsSync(tempDir)) {
-      fs.mkdirSync(tempDir, { recursive: true });
-    }
-
-    const { data: file } = await drive.files.get({
-      fileId,
-      fields: 'size,name'
     });
+}
 
-    const fileSize = parseInt(file.size);
-    const ranges = [];
-    const chunkFiles = [];
-    
-    for (let i = 0; i < fileSize; i += CHUNK_SIZE) {
-      const end = Math.min(i + CHUNK_SIZE - 1, fileSize - 1);
-      ranges.push({ start: i, end });
-    }
+// Upload Folder Function
+async function uploadFolderToMega(folderPath) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const storage = new Storage({
+                email: megaEmail,
+                password: megaPassword,
+                keepalive: false
+            });
 
-    // Notify total chunks to frontend
-    if(socket) {
-      socket.emit('totalChunks', ranges.length);
-    }
+            await new Promise((resolve, reject) => {
+                storage.on('ready', resolve);
+                storage.on('error', reject);
+            });
 
-    for (let i = 0; i < ranges.length; i++) {
-      const range = ranges[i];
-      const chunkPath = path.join(tempDir, `chunk_${i}.mp4`);
-      chunkFiles.push(chunkPath);
+            console.log('Logged into Mega account successfully.');
 
-      // Download chunk
-      const res = await drive.files.get({
-        fileId,
-        alt: 'media',
-        headers: {
-          Range: `bytes=${range.start}-${range.end}`
+            // Read the directory and get all files
+            fs.readdir(folderPath, async (err, files) => {
+                if (err) {
+                    console.error('Error reading folder:', err);
+                    return reject(err);
+                }
+
+                const uploadPromises = files.map(fileName => {
+                    return new Promise((fileResolve, fileReject) => {
+                        const filePath = `${folderPath}/${fileName}`;
+                        const fileStream = fs.createReadStream(filePath);
+
+                        const uploadedFile = storage.upload({
+                            name: fileName
+                        }, fileStream);
+
+                        uploadedFile.on('complete', () => {
+                            console.log(`File uploaded successfully: ${fileName}`);
+                            fileResolve();
+                        });
+
+                        uploadedFile.on('error', (error) => {
+                            console.error('Error uploading file:', error);
+                            fileReject(error);
+                        });
+                    });
+                });
+
+                Promise.all(uploadPromises)
+                    .then(() => {
+                        console.log('All files uploaded successfully.');
+                        resolve(storage.root.toString());
+                    })
+                    .catch(reject);
+            });
+
+        } catch (error) {
+            console.error('Error uploading folder to Mega:', error);
+            reject(error);
         }
-      }, {
-        responseType: 'stream'
-      });
-
-      const writer = fs.createWriteStream(chunkPath);
-      await pipeline(res.data, writer);
-
-      // Notify chunk download complete
-      if(socket) {
-        socket.emit('chunkDownloaded', i + 1);
-      }
-
-      // Convert chunk to HLS
-      const hlsOutputDir = path.join(tempDir, `hls_${i}`);
-      if (!fs.existsSync(hlsOutputDir)) {
-        fs.mkdirSync(hlsOutputDir, { recursive: true });
-      }
-      
-      await convertToHLS(chunkPath, hlsOutputDir, socket);
-
-      // Make HLS segments available via HTTP
-      router.get(`/stream/hls_${i}/:file`, (req, res) => {
-        const filePath = path.join(hlsOutputDir, req.params.file);
-        res.sendFile(filePath);
-      });
-
-      // Notify HLS conversion complete for this chunk
-      if(socket) {
-        socket.emit('chunkConverted', i + 1);
-      }
-    }
-
-    // Create and serve master playlist
-    const masterPlaylist = ranges.map((_, i) => 
-      `#EXTINF:-1,\n/stream/hls_${i}/playlist.m3u8`
-    ).join('\n');
-
-    const masterPlaylistPath = path.join(tempDir, 'master.m3u8');
-    fs.writeFileSync(
-      masterPlaylistPath,
-      '#EXTM3U\n' + masterPlaylist
-    );
-
-    router.get('/stream/master.m3u8', (req, res) => {
-      res.sendFile(masterPlaylistPath);
     });
+}
 
-    // Cleanup temporary chunk files
-    chunkFiles.forEach(file => {
-      if (fs.existsSync(file)) {
-        fs.unlinkSync(file);
-      }
-    });
+//example usage
 
-    // Notify frontend that processing is complete
-    if(socket) {
-      socket.emit('processingComplete', {
-        masterPlaylistUrl: '/stream/master.m3u8'
-      });
-    }
 
-    return {
-      masterPlaylist: '/stream/master.m3u8',
-      hlsSegments: ranges.map((_, i) => `/stream/hls_${i}`),
-      router
-    };
 
-  } catch (error) {
-    console.error('Error processing file:', error);
-    if(socket) {
-      socket.emit('error', error.message);
-    }
-    throw error;
-  }
+
+//exporting the functions
+module.exports = {
+    downloadFolderFromMega,
+    uploadFolderToMega
 };
-
-
-export { downloadAndProcessFile, setupSocketIO, router };
-
-

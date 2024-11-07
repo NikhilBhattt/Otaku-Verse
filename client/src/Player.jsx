@@ -3,18 +3,18 @@ import axios from 'axios'
 import player from './assets/svgs/player.svg'
 import VideoPlayer from './components/VideoPlayer'
 
-const Player = () => {
+const Player = ({streamId}) => {
   const [streamUrl, setStreamUrl] = useState(null);
 
   useEffect(() => {
-    axios.post('http://localhost:5000/hls/start-stream', {
-      streamId: 'rj',
-      inputFile: 'videos/rj.mp4'
+    axios.post('http://localhost:3000/hls/start-stream', {
+      streamId: streamId,
+      inputFile: `videos/${streamId}.mp4`
     })
     .then(response => {
       console.log(response);
       if (response.data.success) {
-        setStreamUrl("rj");
+        setStreamUrl('http://localhost:3000/videos/streams/' + streamId + '/playlist.m3u8');
       }
     })
     .catch(error => {
@@ -22,13 +22,13 @@ const Player = () => {
     });
 
     return () => {
-      axios.post('http://localhost:5000/hls/stop-stream/rj')
+      axios.post(`http://localhost:3000/hls/stop-stream/${streamId}`)
         .catch(error => console.error('Error stopping stream:', error));
     };
   }, []);
 
   return (
-    <div className='w-[65vw] h-[74vh] relative right-[2.5vw] bg-white/50'
+    <div className='w-[65vw] h-[74vh] relative right-[2.5vw] bg-black'
       style={{
         maskImage: `url(${player})`,
         maskSize: 'cover',

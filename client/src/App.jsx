@@ -47,7 +47,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Body children={<Home />} />} />
           <Route path="/search" element={<Body children={<Search />} />} />
-          <Route path="/player" element={<Body children={<Player />} />} />
+          <Route path="/player" element={<Body children={<Player streamId={'rj'} />} />} />
           {/* <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} /> */}
         </Routes>

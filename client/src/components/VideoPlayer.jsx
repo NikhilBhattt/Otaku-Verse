@@ -1,8 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import videojs from 'video.js';
+import '@videojs/themes/dist/city/index.css';
+
 import 'video.js/dist/video-js.css';
 
-const VideoPlayer = ({ streamId }) => {
+const VideoPlayer = ({ src }) => {
   const videoRef = useRef(null);
   const playerRef = useRef(null);
 
@@ -15,7 +17,7 @@ const VideoPlayer = ({ streamId }) => {
       responsive: true,
       fluid: true,
       sources: [{
-        src: `http://localhost:5000/videos/streams/rj/playlist.m3u8`,
+        src: src,
         type: 'application/x-mpegURL'
       }],
       html5: {
@@ -72,14 +74,14 @@ const VideoPlayer = ({ streamId }) => {
         playerRef.current = null;
       }
     };
-  }, [streamId]); // Recreate player when streamId changes
+  }, [src]); // Recreate player when streamId changes
 
   return (
-    <div className="video-container">
-      <div data-vjs-player>
+    <div className="video-container pl-4 pt-4 w-[46vw] rounded-sm aspect-video">
+      <div data-vjs-player className="">
         <video
           ref={videoRef}
-          className="video-js vjs-big-play-centered vjs-theme-city"
+          className="video-js vjs-big-play-centered vjs-theme-city "
           playsInline
         />
       </div>

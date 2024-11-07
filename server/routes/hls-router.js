@@ -16,7 +16,19 @@ const __dirname = dirname(__filename);
 router.post('/start-stream', async (req, res) => {
   try {
     const { streamId, inputFile } = req.body;
-    
+
+    // Define the path to the playlist file
+    const playlistPath = path.join(process.cwd(), 'videos', 'streams', streamId, 'playlist.m3u8');
+
+    // Check if the playlist file already exists
+    if (fs.existsSync(playlistPath)) {
+      return res.json({
+        success: true,
+        streamId,
+        playlistUrl: `/videos/streams/${streamId}/playlist.m3u8`
+      });
+    }
+
     // Check if stream already exists
     if (activeStreams.has(streamId)) {
       activeStreams.get(streamId).kill('SIGKILL');

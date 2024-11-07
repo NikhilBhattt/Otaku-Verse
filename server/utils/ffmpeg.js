@@ -10,9 +10,8 @@ const createHLSStream = ({ inputFile, streamId }) => {
   }
 
   const outputOptions = [
-    '-hls_list_size 10',
+    '-hls_list_size 0',
     '-hls_time 4',
-    '-hls_flags delete_segments',
     `-hls_segment_filename ${streamDir}/segment_%03d.ts`
   ];
 

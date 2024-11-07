@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Home from './Home'
 import Search from './Search'
 import Body from './components/Body'
+import Upload from './Upload'
 import { motion } from 'framer-motion'
 import Player from './Player'
 import './app.css'
@@ -48,6 +49,7 @@ function App() {
           <Route path="/" element={<Body children={<Home />} />} />
           <Route path="/search" element={<Body children={<Search />} />} />
           <Route path="/player" element={<Body children={<Player streamId={'rj'} />} />} />
+          <Route path="/upload" element={<Body children={<Upload/>} />} />
           {/* <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} /> */}
         </Routes>

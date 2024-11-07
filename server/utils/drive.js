@@ -1,5 +1,6 @@
-const fs = require('fs');
-const { Storage, File } = require('megajs');
+// Importing necessary modules
+import fs from 'fs';
+import { Storage, File } from 'megajs';
 
 // Replace these with your Mega.nz account details
 const megaEmail = process.env.MEGA_EMAIL;
@@ -115,7 +116,7 @@ const uploadFolderToMega = async (folderPath) => {
 };
 
 // Exporting the functions
-module.exports = {
+export {
     downloadFolderFromMega,
     uploadFolderToMega
 };

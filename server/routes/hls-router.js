@@ -6,6 +6,7 @@ import { createHLSStream } from '../utils/ffmpeg.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { downloadFolderFromMega } from '../utils/drive.js';
+import { Anime } from '../models/anime.model'; // Import the Anime model
 
 const router = express.Router();
 const activeStreams = new Map();
@@ -16,7 +17,16 @@ const __dirname = dirname(__filename);
 // Start stream endpoint
 router.post('/start-stream', async (req, res) => {
   try {
-    const { streamId } = req.body;
+    const { streamId, animeName, episodeNumber } = req.body; // Expect animeName in the request
+
+    // Find the anime in the database
+    const anime = await Anime.findOne({ name: animeName }).populate('episodes');
+    if (!anime || anime.episodes.length === 0) {
+      return res.status(404).json({ success: false, message: 'Anime or episodes not found' });
+    }
+
+    // Use the first episode's link
+    const megaFileUrl = anime.episodes[episodeNumber - 1].link;
 
     // Define the path to the playlist file
     const playlistPath = path.join(process.cwd(), 'videos', 'streams', streamId, 'playlist.m3u8');
@@ -26,7 +36,9 @@ router.post('/start-stream', async (req, res) => {
       return res.json({
         success: true,
         streamId,
-        playlistUrl: `/videos/streams/${streamId}/playlist.m3u8`
+        playlistUrl: `/videos/streams/${streamId}/playlist.m3u8`,
+        episodes: anime.episodes,
+        totalEpisodes: anime.episodes.length
       });
     }
 
@@ -43,13 +55,14 @@ router.post('/start-stream', async (req, res) => {
     }
 
     // Download file from Mega
-    const megaFileUrl = req.body.megaFileUrl;
     await downloadFolderFromMega(megaFileUrl, streamDir);
 
     res.json({
       success: true,
       streamId,
-      playlistUrl: `/videos/streams/${streamId}/playlist.m3u8`
+      playlistUrl: `/videos/streams/${streamId}/playlist.m3u8`,
+      episodes: anime.episodes,
+      totalEpisodes: anime.episodes.length
     });
 
   } catch (error) {
@@ -60,7 +73,6 @@ router.post('/start-stream', async (req, res) => {
     });
   }
 });
-
 
 export default router;
 

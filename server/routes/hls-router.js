@@ -16,8 +16,15 @@ const __dirname = dirname(__filename);
 router.post('/start-stream', async (req, res) => {
   console.log('this is hls router');
   try {
-    const { streamId, animeName, episodeNumber } = req.body; // Expect animeName in the request
+    const { animeName } = req.body; // Expect animeName in the request
 
+    const anime = await Anime.findOne({ name: animeName }).populate('episodes');
+    if (!anime || anime.episodes.length === 0) {
+      return res.status(404).json({ success: false, message: 'Anime or episodes not found' });
+    }
+
+    const { streamId, link }= anime.episodes[0]
+    
     const playlistPath = path.join(process.cwd(), 'videos', 'streams', streamId, 'playlist.m3u8');
 
     // Check if the playlist file already exists
@@ -30,16 +37,12 @@ router.post('/start-stream', async (req, res) => {
       });
     }
     // Find the anime in the database
-    const anime = await Anime.findOne({ streamId: streamId }).populate('episodes');
-    if (!anime || anime.episodes.length === 0) {
-      return res.status(404).json({ success: false, message: 'Anime or episodes not found' });
-    }
-
+    console.log(anime.episodes);
     // Use the first episode's link
-    const megaFileUrl = anime.episodes[episodeNumber - 1].link;
-
+    const megaFileUrl = link;
+    
     // Define the path to the playlist file
-
+    
     // Check if stream already exists
     if (activeStreams.has(streamId)) {
       activeStreams.get(streamId).kill('SIGKILL');
@@ -51,10 +54,11 @@ router.post('/start-stream', async (req, res) => {
     if (!fs.existsSync(streamDir)) {
       fs.mkdirSync(streamDir, { recursive: true });
     }
-
+    console.log('downloading file from mega');
     // Download file from Mega
     await downloadFolderFromMega(megaFileUrl, streamDir);
 
+    console.log('file downloaded');
     res.json({
       success: true,
       streamId,

@@ -3,12 +3,12 @@ import axios from 'axios'
 import player from './assets/svgs/player.svg'
 import VideoPlayer from './components/VideoPlayer'
 
-const Player = ({streamId}) => {
+const Player = ({animeName}) => {
   const [streamUrl, setStreamUrl] = useState(null);
 
   useEffect(() => {
     axios.post('http://localhost:3000/hls/start-stream', {
-      streamId: streamId,
+      animeName: animeName,
     })
     .then(response => {
       console.log(response);

@@ -49,7 +49,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Body children={<Home />} />} />
           <Route path="/search" element={<Body children={<Searchpage />} />} />
-          <Route path="/player" element={<Body children={<Player streamId={'rj'} />} />} />
+          <Route path="/player" element={<Body children={<Player animeName={'okatu'} />} />} />
           <Route path="/upload" element={<Body children={<Upload/>} />} />
         </Routes>
       </BrowserRouter>

@@ -72,41 +72,53 @@ const uploadFolderToMega = async (folderPath) => {
 
             console.log('Logged into Mega account successfully.');
 
-            // Read the directory and get all files
-            fs.readdir(folderPath, async (err, files) => {
+            // Create a new folder in Mega
+            storage.mkdir(Date.now().toString(), async (err, folder) => {
                 if (err) {
-                    console.error('Error reading folder:', err);
+                    console.error('Error creating folder in Mega:', err);
                     return reject(err);
                 }
 
-                const uploadPromises = files.map(fileName => {
-                    return new Promise((fileResolve, fileReject) => {
-                        const filePath = `${folderPath}/${fileName}`;
-                        const fileStream = fs.createReadStream(filePath);
+                console.log('Folder created successfully in Mega.');
 
-                        const uploadedFile = storage.upload({
-                            name: fileName,
-                            allowUploadBuffering: true
-                        }, fileStream);
+                // Read the directory and get all files
+                fs.readdir(folderPath, async (err, files) => {
+                    if (err) {
+                        console.error('Error reading folder:', err);
+                        return reject(err);
+                    }
 
-                        uploadedFile.on('complete', () => {
-                            console.log(`File uploaded successfully: ${fileName}`);
-                            fileResolve();
-                        });
+                    const uploadPromises = files.map(fileName => {
+                        return new Promise((fileResolve, fileReject) => {
+                            const filePath = `${folderPath}/${fileName}`;
+                            const fileStream = fs.createReadStream(filePath);
 
-                        uploadedFile.on('error', (error) => {
-                            console.error('Error uploading file:', error);
-                            fileReject(error);
+                            // Upload each file to the created folder
+                            const uploadedFile = storage.upload({
+                                name: fileName,
+                                size: fs.statSync(filePath).size,
+                                target: folder // Specify the target folder
+                            }, fileStream);
+
+                            uploadedFile.on('complete', () => {
+                                console.log(`File uploaded successfully: ${fileName}`);
+                                fileResolve();
+                            });
+
+                            uploadedFile.on('error', (error) => {
+                                console.error('Error uploading file:', error);
+                                fileReject(error);
+                            });
                         });
                     });
-                });
 
-                Promise.all(uploadPromises)
-                    .then(() => {
-                        console.log('All files uploaded successfully.');
-                        resolve(storage.root.toString());
-                    })
-                    .catch(reject);
+                    Promise.all(uploadPromises)
+                        .then(() => {
+                            console.log('All files uploaded successfully.');
+                            resolve(folder.link()); // Return the link to the uploaded folder
+                        })
+                        .catch(reject);
+                });
             });
 
         } catch (error) {
